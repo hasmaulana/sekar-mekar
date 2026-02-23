@@ -1,263 +1,102 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sekar Mekar | Premium Florist</title>
+    <title>Sekar Mekar | Florist Premium</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        :root { --soft-green: #f4f9f4; --dark-green: #1b4332; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--soft-green); scroll-behavior: smooth; overflow-x: hidden; }
-        h1, h2, h3 { font-family: 'Playfair Display', serif; }
-        
-        .parallax-hero {
-            background-image: linear-gradient(rgba(255,255,255,0.4), rgba(255,255,255,0.4)), url('https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=1600&q=80');
-            background-attachment: fixed;
-            background-position: center;
-            background-size: cover;
-            height: 50vh;
-        }
-        
-        .flower-float { animation: float 6s ease-in-out infinite; pointer-events: none; }
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
-        }
-
-        .color-dot { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.1); display: inline-block; }
-
-        @media (max-width: 768px) { .parallax-hero { background-attachment: scroll; } }
-    </style>
-</head>
-<body x-data="flowerStore()" x-init="AOS.init({duration: 1000, once: true})">
-
-    <img src="https://www.transparentpng.com/download/floral/pink-flower-watercolor-png-transparent-8.png" class="flower-float fixed -top-10 -left-10 w-40 opacity-40 z-0" alt="deco">
-    <img src="https://www.transparentpng.com/download/floral/watercolor-flower-green-leaves-png-21.png" class="flower-float fixed bottom-10 -right-10 w-48 opacity-30 z-0" style="animation-delay: 2s;" alt="deco">
-
-    <nav class="sticky top-0 z-50 bg-white/70 backdrop-blur-lg border-b border-green-100 px-4 py-3 flex justify-between items-center shadow-sm">
-        <div class="flex flex-col">
-            <span class="text-xl font-bold text-green-900 leading-tight">Sekar Mekar</span>
-            <span class="text-[10px] uppercase tracking-widest text-green-700">Premium Florist</span>
-        </div>
-        <button @click="showCart = true" class="relative p-2 bg-green-800 text-white rounded-full shadow-lg transition hover:scale-105">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-            </svg>
-            <span x-show="cart.length > 0" x-text="cartCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full h-5 w-5 flex items-center justify-center border-2 border-white"></span>
-        </button>
-    </nav>
-
-    <header class="parallax-hero flex items-center justify-center text-center px-6 relative overflow-hidden">
-        <div data-aos="zoom-in" class="bg-white/40 backdrop-blur-md p-8 rounded-3xl border border-white/50 shadow-2xl">
-            <h1 class="text-4xl md:text-6xl font-bold text-green-950 mb-2">Artisan Flowers</h1>
-            <p class="text-green-900 italic text-lg">Hand-picked elegance for your home</p>
-            <div class="mt-6 flex flex-wrap justify-center gap-2">
-                <span class="text-[10px] bg-white/80 px-3 py-1 rounded-full text-green-800 font-bold border border-green-200 shadow-sm">MIN 50K: FREE ROSE</span>
-                <span class="text-[10px] bg-white/80 px-3 py-1 rounded-full text-green-800 font-bold border border-green-200 shadow-sm">MIN 100K: 5% OFF</span>
-            </div>
-        </div>
-    </header>
-
-    <main class="max-w-7xl mx-auto px-4 py-16 relative z-10">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <template x-for="(flower, fIndex) in products" :key="flower.name">
-                <div data-aos="fade-up" class="bg-white rounded-3xl shadow-xl overflow-hidden border border-white flex flex-col group">
-                    <div class="h-56 relative overflow-hidden">
-                        <img :src="flower.image" :alt="flower.name" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                        <div class="absolute top-4 right-4 bg-white/90 px-3 py-1 rounded-full text-[10px] font-bold text-green-800 shadow-sm">
-                            H-2 Holiday Orders
-                        </div>
-                    </div>
-                    
-                    <div class="p-6 flex-grow flex flex-col">
-                        <h3 class="text-2xl font-bold text-green-900 mb-1" x-text="flower.name"></h3>
-                        
-                        <div class="flex items-center gap-2 mb-4">
-                            <template x-for="color in flower.colors" :key="color.name">
-                                <div class="group/tip relative">
-                                    <div :class="'color-dot ' + color.class" :title="color.name"></div>
-                                </div>
-                            </template>
-                        </div>
-
-                        <div class="bg-gray-50 rounded-2xl p-4 space-y-4 mb-4">
-                            <div>
-                                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Select Color</label>
-                                <select x-model="flower.selectedColor" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-green-100">
-                                    <template x-for="color in flower.colors" :key="color.name">
-                                        <option :value="color.name" x-text="color.name"></option>
-                                    </template>
-                                </select>
-                            </div>
-
-                            <div class="space-y-2">
-                                <template x-for="price in flower.pricing" :key="price.label">
-                                    <div class="flex items-center justify-between gap-2 border-b border-gray-100 pb-2 last:border-0 last:pb-0">
-                                        <div class="flex flex-col">
-                                            <span class="text-xs font-semibold text-gray-700" x-text="price.label"></span>
-                                            <span class="text-sm font-bold text-green-800" x-text="price.val + 'K'"></span>
-                                        </div>
-                                        
-                                        <div class="flex items-center bg-white border border-gray-200 rounded-full px-2 py-1">
-                                            <input type="number" min="1" x-model="price.qty" class="w-8 text-center text-xs font-bold outline-none">
-                                            <button @click="addToCart(flower, price)" class="bg-green-800 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs hover:bg-green-900 transition active:scale-90">+</button>
-                                        </div>
-                                    </div>
-                                </template>
-                            </div>
-                        </div>
-                        <p class="text-[10px] text-gray-400 italic mt-auto">* Max 2 colors per mix bundle</p>
-                    </div>
-                </div>
-            </template>
-        </div>
-    </main>
-
-    <div x-show="showCart" x-transition.opacity class="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm" style="display: none;">
-        <div @click.away="showCart = false" class="absolute inset-y-0 right-0 w-full md:max-w-md bg-white shadow-2xl flex flex-col h-full">
-            <div class="p-6 bg-green-900 text-white flex justify-between items-center shadow-lg">
-                <h2 class="text-2xl font-bold">Your Basket</h2>
-                <button @click="showCart = false" class="text-3xl font-light">&times;</button>
-            </div>
-
-            <div class="flex-grow overflow-y-auto p-6 space-y-4 bg-green-50/30">
-                <template x-if="cart.length === 0">
-                    <div class="text-center py-20 opacity-40 italic">Basket is empty</div>
-                </template>
-                <template x-for="(item, index) in cart" :key="index">
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-green-100 flex justify-between items-center">
-                        <div>
-                            <p class="font-bold text-green-900" x-text="item.qty + 'x ' + item.flowerName"></p>
-                            <div class="flex items-center gap-2">
-                                <div :class="'color-dot w-2 h-2 ' + item.colorClass"></div>
-                                <p class="text-[10px] text-gray-500 uppercase tracking-tighter" x-text="item.colorName + ' • ' + item.optionLabel"></p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <span class="font-bold text-green-800" x-text="(item.price * item.qty) + 'K'"></span>
-                            <button @click="removeFromCart(index)" class="text-red-300 hover:text-red-500 text-xl font-bold">&times;</button>
-                        </div>
-                    </div>
-                </template>
-            </div>
-
-            <div class="p-6 border-t border-gray-100 space-y-4 bg-white">
-                <div class="flex justify-between text-gray-500 text-sm">
-                    <span>Subtotal</span>
-                    <span x-text="subtotal + 'K'"></span>
-                </div>
-                <div x-show="subtotal >= 100" class="flex justify-between text-blue-600 text-sm font-bold">
-                    <span>Loyalty Discount (5%)</span>
-                    <span x-text="'-' + discountValue + 'K'"></span>
-                </div>
-                <div x-show="subtotal >= 50" class="p-2 bg-green-50 text-[10px] text-green-800 font-bold text-center rounded-lg border border-green-100 uppercase">
-                    🎁 Bonus: 1 Free Mawar Included!
-                </div>
-                <div class="flex justify-between text-2xl font-bold text-green-950 pt-2 border-t">
-                    <span>Total</span>
-                    <span x-text="'Rp ' + finalTotal + '.000'"></span>
-                </div>
-                <button @click="checkout()" class="w-full bg-green-800 text-white py-4 rounded-2xl font-bold shadow-xl hover:bg-green-950 transition active:scale-95 flex items-center justify-center gap-3">
-                    Send to WhatsApp
-                </button>
-            </div>
-        </div>
-    </div>
-
+    
+    <!-- Alpine.js Initialization -->
     <script>
-        function flowerStore() {
-            return {
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('flowerStore', () => ({
                 showCart: false,
                 cart: [],
                 products: [
                     { 
-                        name: 'Krisan', 
-                        image: 'https://images.unsplash.com/photo-1634547902972-af9800045507?auto=format&fit=crop&w=500&q=80', 
+                        name: 'Krisan',
+                        image: 'img/krisan.jpg',
                         selectedColor: 'Pink',
                         colors: [
                             {name: 'Pink', class: 'bg-pink-300'}, 
                             {name: 'Putih', class: 'bg-white'}, 
                             {name: 'Kuning', class: 'bg-yellow-300'}
-                        ], 
-                        pricing: [{label: '1 Ikat (10)', val: 30, qty: 1}, {label: '1/2 Ikat (5)', val: 17, qty: 1}, {label: 'Satuan', val: 5, qty: 1}] 
+                        ],
+                        pricing: [{label: '1 Ikat (10 Tangkai)', val: 30, qty: 1}, {label: '1/2 Ikat (5 Tangkai)', val: 17, qty: 1}, {label: 'Satuan', val: 5, qty: 1}]
                     },
                     { 
-                        name: 'Mawar', 
-                        image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=500&q=80', 
+                        name: 'Mawar',
+                        image: 'img/mawar.jpg',
                         selectedColor: 'Merah',
                         colors: [
                             {name: 'Merah', class: 'bg-red-600'}, 
                             {name: 'Putih', class: 'bg-white'}, 
                             {name: 'Pink', class: 'bg-pink-400'}
-                        ], 
-                        pricing: [{label: '1 Ikat (10)', val: 25, qty: 1}, {label: '1/2 Ikat (5)', val: 15, qty: 1}, {label: 'Satuan', val: 5, qty: 1}] 
+                        ],
+                        pricing: [{label: '1 Ikat (10 Tangkai)', val: 25, qty: 1}, {label: '1/2 Ikat (5 Tangkai)', val: 15, qty: 1}, {label: 'Satuan', val: 5, qty: 1}]
                     },
                     { 
-                        name: 'Aster', 
-                        image: 'https://images.unsplash.com/photo-1596272780722-da648a101f3f?auto=format&fit=crop&w=500&q=80', 
+                        name: 'Aster',
+                        image: 'img/aster.jpg',
                         selectedColor: 'Pink',
                         colors: [
                             {name: 'Pink', class: 'bg-pink-300'}, 
                             {name: 'Putih', class: 'bg-white'}, 
                             {name: 'Kuning', class: 'bg-yellow-300'},
                             {name: 'Merah', class: 'bg-red-500'}
-                        ], 
-                        pricing: [{label: '1 Ikat (10)', val: 30, qty: 1}, {label: '1/2 Ikat (5)', val: 17, qty: 1}, {label: 'Satuan', val: 4, qty: 1}] 
+                        ],
+                        pricing: [{label: '1 Ikat (10 Tangkai)', val: 30, qty: 1}, {label: '1/2 Ikat (5 Tangkai)', val: 17, qty: 1}, {label: 'Satuan', val: 4, qty: 1}]
                     },
                     { 
-                        name: 'Gompi', 
-                        image: 'https://images.unsplash.com/photo-1563241527-3004b7be0fab?auto=format&fit=crop&w=500&q=80', 
+                        name: 'Gompi',
+                        image: 'img/gompi.jpg',
                         selectedColor: 'Lemon',
                         colors: [
                             {name: 'Lemon', class: 'bg-yellow-200'}, 
                             {name: 'Pink/Salem', class: 'bg-orange-200'}
-                        ], 
-                        pricing: [{label: '1 Ikat (10)', val: 45, qty: 1}, {label: '1/2 Ikat (5)', val: 25, qty: 1}, {label: 'Satuan', val: 6, qty: 1}] 
+                        ],
+                        pricing: [{label: '1 Ikat (10 Tangkai)', val: 45, qty: 1}, {label: '1/2 Ikat (5 Tangkai)', val: 25, qty: 1}, {label: 'Satuan', val: 6, qty: 1}]
                     },
                     { 
-                        name: 'Pikok', 
-                        image: 'https://images.unsplash.com/photo-1559734840-f9509ee5670f?auto=format&fit=crop&w=500&q=80', 
+                        name: 'Pikok',
+                        image: 'img/pikok.jpg',
                         selectedColor: 'Putih',
                         colors: [
                             {name: 'Putih', class: 'bg-white'}, 
                             {name: 'Ungu', class: 'bg-purple-500'},
                             {name: 'Biru', class: 'bg-blue-500'},
                             {name: 'Pink', class: 'bg-pink-300'}
-                        ], 
-                        pricing: [{label: '1 Ikat (10)', val: 15, qty: 1}, {label: '1/2 Ikat (5)', val: 10, qty: 1}, {label: 'Satuan', val: 3, qty: 1}] 
+                        ],
+                        pricing: [{label: '1 Ikat (10 Tangkai)', val: 15, qty: 1}, {label: '1/2 Ikat (5 Tangkai)', val: 10, qty: 1}, {label: 'Satuan', val: 3, qty: 1}]
                     },
                     { 
-                        name: 'Garbera', 
-                        image: 'https://images.unsplash.com/photo-1508784411316-02b8cd4d3a3a?auto=format&fit=crop&w=500&q=80', 
+                        name: 'Garbera',
+                        image: 'img/garbera.jpg',
                         selectedColor: 'Merah',
                         colors: [
                             {name: 'Merah', class: 'bg-red-600'}, 
                             {name: 'Pink', class: 'bg-pink-400'},
                             {name: 'Kuning/Oren', class: 'bg-orange-400'}
-                        ], 
-                        pricing: [{label: '1 Ikat (10)', val: 35, qty: 1}, {label: '1/2 Ikat (5)', val: 20, qty: 1}, {label: 'Satuan', val: 5, qty: 1}] 
+                        ],
+                        pricing: [{label: '1 Ikat (10 Tangkai)', val: 35, qty: 1}, {label: '1/2 Ikat (5 Tangkai)', val: 20, qty: 1}, {label: 'Satuan', val: 5, qty: 1}]
                     },
                     { 
-                        name: 'Pom-Pom', 
-                        image: 'https://images.unsplash.com/photo-1626897505254-e04a75a55dbd?auto=format&fit=crop&w=500&q=80', 
+                        name: 'Pom-Pom',
+                        image: 'img/pompom.jpg',
                         selectedColor: 'Putih',
                         colors: [
                             {name: 'Putih', class: 'bg-white'}, 
                             {name: 'Pink', class: 'bg-pink-300'},
                             {name: 'Kuning', class: 'bg-yellow-300'}
-                        ], 
-                        pricing: [{label: '1 Ikat (10)', val: 35, qty: 1}, {label: '1/2 Ikat (5)', val: 20, qty: 1}, {label: 'Satuan', val: 5, qty: 1}] 
+                        ],
+                        pricing: [{label: '1 Ikat (10 Tangkai)', val: 35, qty: 1}, {label: '1/2 Ikat (5 Tangkai)', val: 20, qty: 1}, {label: 'Satuan', val: 5, qty: 1}]
                     },
                     { 
-                        name: 'Sedap Malam', 
-                        image: 'https://images.unsplash.com/photo-1597848212624-a19eb35e2651?auto=format&fit=crop&w=500&q=80', 
+                        name: 'Sedap Malam',
+                        image: 'img/sedap-malam.jpg',
                         selectedColor: 'Standard',
                         colors: [ {name: 'Standard', class: 'bg-stone-50'} ], 
-                        pricing: [{label: '1 Ikat (10)', val: 90, qty: 1}, {label: 'Satuan', val: 10, qty: 1}] 
+                        pricing: [{label: '1 Ikat (10 Tangkai)', val: 90, qty: 1}, {label: 'Satuan', val: 10, qty: 1}]
                     }
                 ],
                 addToCart(flower, priceObj) {
@@ -270,7 +109,7 @@
                         colorName: flower.selectedColor,
                         colorClass: colorObj.class
                     });
-                    priceObj.qty = 1; // reset
+                    priceObj.qty = 1; 
                 },
                 removeFromCart(index) { this.cart.splice(index, 1); },
                 get cartCount() { return this.cart.length; },
@@ -278,19 +117,275 @@
                 get discountValue() { return this.subtotal >= 100 ? Math.round(this.subtotal * 0.05) : 0; },
                 get finalTotal() { return this.subtotal - this.discountValue; },
                 checkout() {
-                    if (this.cart.length === 0) return alert("Basket is empty!");
+                    if (this.cart.length === 0) return;
                     let msg = "*Pesanan Sekar Mekar Florist*\n--------------------------\n";
                     this.cart.forEach((item, i) => {
-                        msg += `${i+1}. ${item.qty}x ${item.flowerName} (${item.colorName})\n   - Type: ${item.optionLabel}\n   - Sub: ${item.price * item.qty}K\n\n`;
+                        msg += `${i+1}. ${item.qty}x ${item.flowerName} (${item.colorName})\n   - Jenis: ${item.optionLabel}\n   - Sub: ${item.price * item.qty}rb\n\n`;
                     });
-                    msg += `Subtotal: ${this.subtotal}K\n`;
-                    if(this.discountValue > 0) msg += `Diskon (5%): -${this.discountValue}K\n`;
-                    if(this.subtotal >= 50) msg += `Promo: +1 Free Mawar Bonus\n`;
+                    msg += `Subtotal: ${this.subtotal}rb\n`;
+                    if(this.discountValue > 0) msg += `Diskon (5%): -${this.discountValue}rb\n`;
+                    if(this.subtotal >= 50) msg += `Promo: +1 Gratis Mawar Bonus\n`;
                     msg += `*Total Akhir: Rp ${this.finalTotal}.000*`;
                     window.open(`https://wa.me/6285706749309?text=${encodeURIComponent(msg)}`, '_blank');
                 }
-            }
-        }
+            }));
+        });
     </script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --soft-green: #f4f9f4; --dark-green: #1b4332; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--soft-green); scroll-behavior: smooth; overflow-x: hidden; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+        
+        .hero-banner {
+            background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&q=80&w=1200');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .flower-float { animation: float 6s ease-in-out infinite; pointer-events: none; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .color-dot { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.1); display: inline-block; }
+
+        .pulse-soft {
+            box-shadow: 0 0 0 0 rgba(27, 67, 50, 0.4);
+            animation: pulse-animation 2s infinite;
+        }
+        @keyframes pulse-animation {
+            0% { box-shadow: 0 0 0 0 rgba(27, 67, 50, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(27, 67, 50, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(27, 67, 50, 0); }
+        }
+    </style>
+</head>
+<body x-data="flowerStore" x-init="AOS.init({duration: 1000, once: true})">
+
+    <!-- Navigasi -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-green-100 px-6 py-4 flex justify-between items-center">
+        <div class="flex flex-col">
+            <span class="text-2xl font-bold text-green-900 leading-tight">Sekar Mekar</span>
+            <span class="text-[10px] uppercase tracking-widest text-green-700">Florist Premium</span>
+        </div>
+        <button @click="showCart = true" class="relative p-3 bg-green-800 text-white rounded-full shadow-lg transition hover:bg-green-900 active:scale-95">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+            <template x-if="cart.length > 0">
+                <span x-text="cartCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full h-5 w-5 flex items-center justify-center border-2 border-white"></span>
+            </template>
+        </button>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero-banner h-[60vh] flex items-center justify-center text-center px-6">
+        <div data-aos="zoom-in" class="bg-white/30 backdrop-blur-xl p-10 rounded-3xl border border-white/40 shadow-2xl max-w-2xl">
+            <h1 class="text-5xl md:text-7xl font-bold text-white mb-4 drop-shadow-lg">Bunga Segar</h1>
+            <p class="text-white text-xl md:text-2xl italic drop-shadow-md mb-8">Keanggunan untuk momen paling spesial Anda</p>
+            <div class="flex flex-wrap justify-center gap-3">
+                <span class="bg-green-800/90 text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider">Min 50rb: Gratis 1 Mawar</span>
+                <span class="bg-green-800/90 text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider">Min 100rb: Diskon 5%</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Katalog Produk -->
+    <main class="max-w-7xl mx-auto px-6 py-20">
+        <h2 class="text-4xl font-bold text-green-950 mb-12 text-center" data-aos="fade-up">Koleksi Kami</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <template x-for="(flower, fIndex) in products" :key="flower.name">
+                <div data-aos="fade-up" :data-aos-delay="fIndex * 50" class="bg-white rounded-[2rem] shadow-xl shadow-green-900/5 overflow-hidden border border-green-50 flex flex-col group transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl">
+                    <div class="h-64 relative overflow-hidden">
+                        <img :src="flower.image" :alt="flower.name" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    </div>
+                    
+                    <div class="p-8 flex-grow flex flex-col">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-2xl font-bold text-green-950" x-text="flower.name"></h3>
+                            <div class="flex gap-1.5 pt-2">
+                                <template x-for="color in flower.colors" :key="color.name">
+                                    <div :class="'color-dot ' + color.class" :title="color.name"></div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4 mb-6">
+                            <div>
+                                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Pilih Warna</label>
+                                <select x-model="flower.selectedColor" class="w-full bg-green-50/50 border border-green-100 rounded-xl px-4 py-2.5 text-sm text-green-900 outline-none focus:ring-2 focus:ring-green-200 transition-all cursor-pointer">
+                                    <template x-for="color in flower.colors" :key="color.name">
+                                        <option :value="color.name" x-text="color.name"></option>
+                                    </template>
+                                </select>
+                            </div>
+
+                            <div class="space-y-3">
+                                <template x-for="price in flower.pricing" :key="price.label">
+                                    <div class="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-transparent hover:border-green-100 hover:bg-white transition-all">
+                                        <div class="flex flex-col">
+                                            <span class="text-xs font-medium text-gray-600" x-text="price.label"></span>
+                                            <span class="text-base font-bold text-green-800" x-text="price.val + 'rb'"></span>
+                                        </div>
+                                        
+                                        <div class="flex items-center gap-3">
+                                            <input type="number" min="1" x-model="price.qty" class="w-10 bg-transparent text-center text-sm font-bold text-green-900 outline-none">
+                                            <button @click="addToCart(flower, price)" class="bg-green-800 text-white w-8 h-8 rounded-full flex items-center justify-center transition hover:bg-green-950 active:scale-90 shadow-md">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </main>
+
+    <!-- Info Section -->
+    <section class="max-w-4xl mx-auto px-6 mb-32" data-aos="fade-up">
+        <div class="bg-white rounded-[3rem] p-12 border border-green-50 shadow-2xl text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-24 h-24 bg-green-50 rounded-full -translate-x-12 -translate-y-12 opacity-50"></div>
+            <h3 class="text-3xl font-bold text-green-950 mb-8">Informasi Pesanan</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left text-green-900">
+                <div class="space-y-4">
+                    <p class="flex gap-3">
+                        <span class="text-green-600 font-bold">•</span>
+                        <span>Pembelian <strong>MIX</strong> maksimal 2 warna dalam jenis yang sama.</span>
+                    </p>
+                    <p class="flex gap-3">
+                        <span class="text-green-600 font-bold">•</span>
+                        <span>Pengambilan & pengantaran <strong>H-2 Hari Raya</strong>.</span>
+                    </p>
+                </div>
+                <div class="space-y-4">
+                    <p class="flex gap-3">
+                        <span class="text-green-600 font-bold">•</span>
+                        <span>Harga Sedap Malam dapat berubah sewaktu-waktu.</span>
+                    </p>
+                    <p class="flex gap-3">
+                        <span class="text-green-600 font-bold">•</span>
+                        <span>Hubungi CS: <a href="tel:085706749309" class="font-bold underline">085706749309</a></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sidebar Keranjang -->
+    <div x-show="showCart" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-[100] bg-green-950/20 backdrop-blur-sm" 
+         style="display: none;">
+        
+        <div @click.away="showCart = false" 
+             x-show="showCart"
+             x-transition:enter="transition ease-out duration-300 transform"
+             x-transition:enter-start="translate-x-full"
+             x-transition:enter-end="translate-x-0"
+             x-transition:leave="transition ease-in duration-200 transform"
+             x-transition:leave-start="translate-x-0"
+             x-transition:leave-end="translate-x-full"
+             class="absolute inset-y-0 right-0 w-full md:max-w-md bg-white shadow-2xl flex flex-col h-full">
+            
+            <div class="p-8 bg-green-900 text-white flex justify-between items-center">
+                <div>
+                    <h2 class="text-3xl font-bold">Pesanan Anda</h2>
+                    <p class="text-xs opacity-70 uppercase tracking-widest mt-1">Sekar Mekar Marketplace</p>
+                </div>
+                <button @click="showCart = false" class="p-2 hover:bg-white/10 rounded-full transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="flex-grow overflow-y-auto p-8 space-y-4 bg-gray-50/50">
+                <template x-if="cart.length === 0">
+                    <div class="text-center py-20">
+                        <div class="bg-gray-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                            </svg>
+                        </div>
+                        <p class="text-gray-400 italic font-medium">Wah, keranjang masih kosong...</p>
+                    </div>
+                </template>
+                
+                <template x-for="(item, index) in cart" :key="index">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-green-100 flex justify-between items-center animate-fadeIn">
+                        <div class="flex-grow">
+                            <p class="font-bold text-green-950 text-lg" x-text="item.qty + 'x ' + item.flowerName"></p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <div :class="'color-dot w-2 h-2 ' + item.colorClass"></div>
+                                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest" x-text="item.colorName + ' — ' + item.optionLabel"></p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-6">
+                            <span class="font-bold text-green-800" x-text="item.price * item.qty + 'rb'"></span>
+                            <button @click="removeFromCart(index)" class="text-red-300 hover:text-red-600 transition p-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <div class="p-8 border-t border-gray-100 space-y-4 bg-white shadow-[0_-10px_40px_rgba(0,0,0,0.03)]">
+                <div class="flex justify-between text-gray-500 font-medium">
+                    <span>Subtotal</span>
+                    <span x-text="subtotal + 'rb'"></span>
+                </div>
+                
+                <template x-if="subtotal >= 100">
+                    <div class="flex justify-between text-green-600 font-bold">
+                        <span>Diskon Member (5%)</span>
+                        <span x-text="'-' + discountValue + 'rb'"></span>
+                    </div>
+                </template>
+                
+                <template x-if="subtotal >= 50">
+                    <div class="p-3 bg-green-50 text-green-700 text-xs font-bold text-center rounded-xl border border-green-100">
+                        ✨ Bonus: Gratis 1 Tangkai Mawar!
+                    </div>
+                </template>
+
+                <div class="flex justify-between text-3xl font-bold text-green-950 pt-4 border-t border-gray-50">
+                    <span>Total</span>
+                    <span x-text="'Rp ' + finalTotal + '.000'"></span>
+                </div>
+                
+                <button @click="checkout()" 
+                        class="w-full bg-green-800 text-white py-5 rounded-2xl font-bold shadow-xl hover:bg-green-900 transition-all active:scale-95 flex items-center justify-center gap-3 mt-4 disabled:opacity-50"
+                        :disabled="cart.length === 0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.438 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884 0 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                    </svg>
+                    Pesan Sekarang (WhatsApp)
+                </button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
