@@ -104,8 +104,8 @@
             <h1 class="text-5xl md:text-7xl font-bold text-white mb-4 drop-shadow-lg">Bunga Segar</h1>
             <p class="text-white text-xl md:text-2xl italic drop-shadow-md mb-8">Keanggunan untuk momen paling spesial Anda</p>
             <div class="flex flex-wrap justify-center gap-3">
-                <span class="bg-green-800/90 text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider">Min 50rb: Gratis 1 Mawar</span>
                 <span class="bg-green-800/90 text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider">Min 100rb: Diskon 5%</span>
+                <span class="bg-green-800/90 text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider">Min 150rb: Gratis 1 Mawar</span>
                 <span class="bg-green-800/90 text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider">Delivery Minimal Order 50rb (Blitar - Tulungagung)</span>
             </div>
         </div>
@@ -455,7 +455,7 @@
 
                     msg += `Subtotal: ${this.subtotal}rb\n`;
                     if(this.discountValue > 0) msg += `Diskon (5%): -${this.discountValue}rb\n`;
-                    if(this.subtotal >= 50) msg += `Promo: +1 Gratis Mawar Bonus\n`;
+                    if(this.subtotal >= 150) msg += `Promo: +1 Gratis Mawar Bonus\n`;
                     msg += `*Total Akhir: Rp ${this.finalTotal}.000*`;
                     
                     // Setelah checkout, data tetap disimpan agar user bisa melihat histori sementara 
