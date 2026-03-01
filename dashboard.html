@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sekar Mekar | Kebutuhan Stok</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
+        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(226, 232, 240, 0.8); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2 text-pink-600 font-bold text-xl">
+                    <i class="fas fa-seedling"></i>
+                    <span>Sekar Mekar <span class="text-slate-400 font-light">Stok</span></span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button id="clearBtn" class="text-slate-400 hover:text-red-500 text-xs font-bold uppercase hidden mr-2">Reset</button>
+                    <label class="cursor-pointer bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Upload JSON</span>
+                        <input type="file" id="fileInput" multiple accept=".json" class="hidden">
+                    </label>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main id="mainContent" class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        
+        <!-- Welcome -->
+        <div id="welcomeScreen" class="flex flex-col items-center justify-center min-h-[60vh] text-center">
+            <div class="w-20 h-20 bg-pink-50 rounded-full flex items-center justify-center mb-6">
+                <i class="fas fa-list-check text-3xl text-pink-500"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-800">Analisis Kebutuhan Stok</h2>
+            <p class="text-slate-500 mt-2 max-w-md">Unggah file pesanan Anda untuk melihat ringkasan kebutuhan bunga per tangkai.</p>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="hidden space-y-6">
+            
+            <!-- Ringkasan Angka -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="glass-card p-5 rounded-2xl shadow-sm border-l-4 border-l-pink-500">
+                    <div class="text-slate-400 text-[10px] font-bold mb-1 uppercase tracking-widest">Total Tangkai</div>
+                    <div id="totalStems" class="text-2xl font-bold text-slate-800 tracking-tight">0</div>
+                </div>
+                <div class="glass-card p-5 rounded-2xl shadow-sm border-l-4 border-l-purple-500">
+                    <div class="text-slate-400 text-[10px] font-bold mb-1 uppercase tracking-widest">Jenis Bunga</div>
+                    <div id="totalVarieties" class="text-2xl font-bold text-slate-800 tracking-tight">0</div>
+                </div>
+                <div class="glass-card p-5 rounded-2xl shadow-sm border-l-4 border-l-emerald-500">
+                    <div class="text-slate-400 text-[10px] font-bold mb-1 uppercase tracking-widest">Total Omzet</div>
+                    <div id="totalRev" class="text-2xl font-bold text-slate-800 tracking-tight">Rp 0</div>
+                </div>
+                <div class="glass-card p-5 rounded-2xl shadow-sm border-l-4 border-l-blue-500">
+                    <div class="text-slate-400 text-[10px] font-bold mb-1 uppercase tracking-widest">Total Pelanggan</div>
+                    <div id="totalCust" class="text-2xl font-bold text-slate-800 tracking-tight">0</div>
+                </div>
+            </div>
+
+            <!-- FOKUS: TABEL KEBUTUHAN STOK -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-8 space-y-6">
+                    <div class="glass-card rounded-2xl shadow-sm overflow-hidden flex flex-col">
+                        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white">
+                            <h3 class="font-bold text-slate-700"><i class="fas fa-boxes-stacked mr-2 text-pink-500"></i>Daftar Belanja Bunga</h3>
+                            <button onclick="window.print()" class="text-xs text-slate-400 hover:text-pink-500 tracking-tighter uppercase font-bold"><i class="fas fa-print mr-1"></i> Cetak</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 text-slate-500 text-[10px] uppercase font-bold tracking-widest border-b border-slate-100">
+                                        <th class="px-6 py-4">Nama Bunga & Warna</th>
+                                        <th class="px-6 py-4 text-center">Jumlah (Tangkai)</th>
+                                        <th class="px-6 py-4">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="stockTableBody" class="divide-y divide-slate-100">
+                                    <!-- Baris diisi oleh JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visualisasi Chart -->
+                <div class="lg:col-span-4 space-y-6">
+                    <div class="glass-card p-6 rounded-2xl shadow-sm h-full flex flex-col min-h-[400px]">
+                        <h3 class="font-bold text-slate-700 mb-6 text-sm uppercase tracking-wider">Proporsi Stok</h3>
+                        <div class="relative flex-grow">
+                            <canvas id="typeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detail Pesanan Asal -->
+            <div class="glass-card rounded-2xl shadow-sm overflow-hidden flex flex-col max-h-[400px]">
+                <div class="px-6 py-4 border-b border-slate-100 bg-white flex justify-between items-center">
+                    <h3 class="font-bold text-slate-700 text-sm italic">Referensi Pesanan</h3>
+                    <div id="orderCountBadge" class="text-[10px] bg-slate-100 text-slate-500 px-2 py-1 rounded-full font-bold">0 ORDERS</div>
+                </div>
+                <div class="overflow-y-auto custom-scrollbar">
+                    <table class="w-full text-left text-xs">
+                        <thead class="sticky top-0 bg-slate-50 z-10 shadow-sm">
+                            <tr class="text-slate-400 uppercase font-bold border-b border-slate-100">
+                                <th class="px-6 py-3">Pelanggan</th>
+                                <th class="px-6 py-3">Rincian Kebutuhan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sourceTableBody" class="divide-y divide-slate-100">
+                            <!-- Baris diisi oleh JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        let allOrders = [];
+        let charts = {};
+
+        const fileInput = document.getElementById('fileInput');
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const dashboard = document.getElementById('dashboard');
+        const clearBtn = document.getElementById('clearBtn');
+
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            let processed = 0;
+
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const json = JSON.parse(event.target.result);
+                        if (!allOrders.find(o => o.id_pesanan === json.id_pesanan)) {
+                            allOrders.push(json);
+                        }
+                    } catch (err) {
+                        console.error("Gagal membaca JSON:", err);
+                    } finally {
+                        processed++;
+                        if (processed === files.length) updateUI();
+                    }
+                };
+                reader.readAsText(file);
+            });
+        });
+
+        clearBtn.addEventListener('click', () => {
+            allOrders = [];
+            updateUI();
+        });
+
+        function updateUI() {
+            if (allOrders.length === 0) {
+                welcomeScreen.classList.remove('hidden');
+                dashboard.classList.add('hidden');
+                clearBtn.classList.add('hidden');
+                return;
+            }
+
+            welcomeScreen.classList.add('hidden');
+            dashboard.classList.remove('hidden');
+            clearBtn.classList.remove('hidden');
+
+            const stats = calculateStats();
+            renderKPIs(stats);
+            renderStockTable(stats);
+            renderCharts(stats);
+            renderSourceTable();
+        }
+
+        function calculateStats() {
+            const stats = {
+                totalRev: 0,
+                customers: new Set(),
+                flowerStems: {}, 
+                flowerVarieties: new Set()
+            };
+
+            allOrders.forEach(o => {
+                stats.totalRev += (o.pesanan?.total_akhir || 0);
+                if (o.pelanggan?.nama) stats.customers.add(o.pelanggan.nama);
+
+                if (o.kebutuhan_stok) {
+                    Object.entries(o.kebutuhan_stok).forEach(([key, qty]) => {
+                        stats.flowerStems[key] = (stats.flowerStems[key] || 0) + qty;
+                        const variety = key.split(' - ')[0];
+                        stats.flowerVarieties.add(variety);
+                    });
+                }
+            });
+
+            return stats;
+        }
+
+        function renderKPIs(stats) {
+            // Memastikan elemen ada sebelum melakukan assignment textContent
+            const elRev = document.getElementById('totalRev');
+            const elCust = document.getElementById('totalCust');
+            const elVars = document.getElementById('totalVarieties');
+            const elStems = document.getElementById('totalStems');
+            const elBadge = document.getElementById('orderCountBadge');
+
+            if (elRev) elRev.textContent = `Rp ${stats.totalRev.toLocaleString()}`;
+            if (elCust) elCust.textContent = stats.customers.size;
+            if (elVars) elVars.textContent = stats.flowerVarieties.size;
+            
+            const totalStems = Object.values(stats.flowerStems).reduce((a, b) => a + b, 0);
+            if (elStems) elStems.textContent = `${totalStems} Tgk`;
+            if (elBadge) elBadge.textContent = `${allOrders.length} ORDERS LOADED`;
+        }
+
+        function renderStockTable(stats) {
+            const tbody = document.getElementById('stockTableBody');
+            if (!tbody) return;
+            
+            const sortedKeys = Object.keys(stats.flowerStems).sort();
+            
+            tbody.innerHTML = sortedKeys.map(key => {
+                const qty = stats.flowerStems[key];
+                return `
+                <tr class="hover:bg-slate-50 transition-all">
+                    <td class="px-6 py-4 font-semibold text-slate-700">
+                        <div class="flex items-center gap-3">
+                            <div class="w-2 h-2 rounded-full bg-pink-400"></div>
+                            ${key}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="bg-pink-50 text-pink-700 px-3 py-1 rounded-lg font-bold border border-pink-100">
+                            ${qty} Tangkai
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest"><i class="fas fa-hourglass-half mr-1"></i> Pending</span>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function renderSourceTable() {
+            const tbody = document.getElementById('sourceTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = allOrders.map(o => `
+                <tr class="hover:bg-slate-50 border-b border-slate-50">
+                    <td class="px-6 py-3 align-top w-1/3">
+                        <div class="font-bold text-slate-800">${o.pelanggan?.nama || 'N/A'}</div>
+                        <div class="text-[10px] text-slate-400 italic font-mono uppercase">${o.id_pesanan}</div>
+                    </td>
+                    <td class="px-6 py-3">
+                        <div class="flex flex-wrap gap-2">
+                            ${Object.entries(o.kebutuhan_stok || {}).map(([key, qty]) => `
+                                <span class="bg-white px-2 py-1 rounded border border-slate-200 text-slate-600">
+                                    ${key}: <b>${qty}</b>
+                                </span>
+                            `).join('')}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderCharts(stats) {
+            const canvas = document.getElementById('typeChart');
+            if (!canvas) return;
+            
+            if (charts.type) charts.type.destroy();
+
+            const typeCtx = canvas.getContext('2d');
+            const grouped = {};
+            Object.entries(stats.flowerStems).forEach(([key, qty]) => {
+                const type = key.split(' - ')[0];
+                grouped[type] = (grouped[type] || 0) + qty;
+            });
+
+            charts.type = new Chart(typeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(grouped),
+                    datasets: [{
+                        data: Object.values(grouped),
+                        backgroundColor: ['#ec4899', '#a855f7', '#3b82f6', '#10b981', '#f59e0b', '#64748b'],
+                        borderWidth: 4,
+                        borderColor: '#ffffff',
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { 
+                            position: 'bottom', 
+                            labels: { padding: 20, usePointStyle: true, font: { weight: 'bold', size: 10 } } 
+                        } 
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+    </script>
+</body>
+</html>

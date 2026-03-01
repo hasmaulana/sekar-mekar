@@ -114,11 +114,11 @@
                                 Data Pelanggan
                             </h2>
                             <div class="grid grid-cols-1 gap-4">
-                                <div>
-                                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Nama Pemesan</label>
-                                    <input type="text" id="custNama" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-slate-700" placeholder="Nama Pelanggan">
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Nama Pemesan</label>
+                                        <input type="text" id="custNama" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-slate-700" placeholder="Nama Pelanggan">
+                                    </div>
                                     <div>
                                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Metode</label>
                                         <select id="custMetode" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-slate-600">
@@ -127,10 +127,21 @@
                                             <option value="kurir">Kurir Toko</option>
                                         </select>
                                     </div>
-                                    <div>
-                                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Tujuan</label>
-                                        <input type="text" id="custTujuan" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700" placeholder="Lokasi">
-                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Tujuan (Singkat)</label>
+                                    <input type="text" id="custTujuan" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Contoh: Lokasi / Patokan">
+                                </div>
+
+                                <div>
+                                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Alamat Lengkap Pemesan</label>
+                                    <textarea id="custAlamat" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500 h-20 resize-none" placeholder="Masukkan alamat detail..."></textarea>
+                                </div>
+
+                                <div>
+                                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Keterangan Pesanan</label>
+                                    <textarea id="custKeterangan" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500 h-24 resize-none" placeholder="Catatan tambahan (Ucapan, request khusus, dll)"></textarea>
                                 </div>
                             </div>
                             
@@ -205,6 +216,8 @@
         const custNama = document.getElementById('custNama');
         const custMetode = document.getElementById('custMetode');
         const custTujuan = document.getElementById('custTujuan');
+        const custAlamat = document.getElementById('custAlamat');
+        const custKeterangan = document.getElementById('custKeterangan');
         const itemTableBody = document.getElementById('itemTableBody');
         const stockTableBody = document.getElementById('stockTableBody');
         const promoBadge = document.getElementById('promoBadge');
@@ -392,11 +405,13 @@
             return {
                 id_pesanan: state.id,
                 timestamp: new Date().toLocaleString('id-ID'),
-                raw_data_pesanan: state.raw_text, // Menyimpan teks asli
+                raw_data_pesanan: state.raw_text,
                 pelanggan: {
                     nama: custNama.value || 'Tanpa Nama',
                     metode: custMetode.value,
-                    tujuan: custTujuan.value || '-'
+                    tujuan: custTujuan.value || '-',
+                    alamat_lengkap: custAlamat.value || '-',
+                    keterangan_pesanan: custKeterangan.value || '-'
                 },
                 pesanan: {
                     items: state.items,
@@ -462,6 +477,8 @@
                         custNama.value = data.pelanggan.nama || '';
                         custMetode.value = data.pelanggan.metode || 'diambil';
                         custTujuan.value = data.pelanggan.tujuan || '';
+                        custAlamat.value = data.pelanggan.alamat_lengkap || '';
+                        custKeterangan.value = data.pelanggan.keterangan_pesanan || '';
                     }
                     if (data.pesanan) {
                         inputDP.value = data.pesanan.dp_dibayar || 0;
