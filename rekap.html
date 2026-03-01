@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekap Transaksi Bunga Pintar - Vanilla JS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen p-4 md:p-8">
+    <div class="max-w-7xl mx-auto space-y-6">
+        
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <div class="flex items-center gap-4">
+                <div class="bg-indigo-600 p-3 rounded-xl text-white shadow-lg shadow-indigo-100">
+                    <i data-lucide="clipboard-list" class="w-8 h-8"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black text-slate-900 leading-tight tracking-tight">
+                        Rekap Transaksi <span class="text-indigo-600 underline decoration-indigo-200 underline-offset-4">Pro</span>
+                    </h1>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Transaction ID:</span>
+                        <code id="displayID" class="text-[10px] font-mono font-bold text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded">AUTO_GENERATING...</code>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <!-- Fitur Load JSON -->
+                <input type="file" id="inputFile" class="hidden" accept=".json">
+                <button id="btnLoad" class="flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-600 px-6 py-4 rounded-xl font-bold transition-all active:scale-95 border border-slate-200 shadow-sm">
+                    <i data-lucide="upload" class="w-5 h-5"></i>
+                    Load JSON
+                </button>
+                <button id="btnDownload" class="flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-4 rounded-xl font-bold transition-all active:scale-95 border border-slate-200">
+                    <i data-lucide="download" class="w-5 h-5"></i>
+                    Download JSON
+                </button>
+                <button id="btnSave" class="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-black transition-all shadow-xl shadow-indigo-100 active:scale-95">
+                    <i data-lucide="save" class="w-5 h-5"></i>
+                    Simpan Transaksi
+                </button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Kolom Input (4/12) -->
+            <div class="lg:col-span-4 space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 h-full flex flex-col">
+                    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                        <i data-lucide="file-text" class="w-4 h-4 text-indigo-500"></i>
+                        Raw Data Pesanan
+                    </label>
+                    <textarea id="rawInput" 
+                        class="flex-grow w-full min-h-[500px] p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all font-mono text-sm shadow-inner resize-none leading-relaxed"
+                        placeholder="Tempel pesanan di sini..."></textarea>
+                    
+                    <div class="mt-4 p-4 bg-indigo-50 rounded-xl border border-indigo-100 flex gap-3">
+                        <i data-lucide="check-square" class="w-5 h-5 text-indigo-600 shrink-0"></i>
+                        <div class="text-[10px] text-indigo-800 leading-normal font-medium">
+                            <strong>Data Persistence:</strong> Mengunduh JSON akan menyertakan teks asli di atas untuk keperluan <em>re-load</em> nantinya.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kolom Preview (8/12) -->
+            <div class="lg:col-span-8 space-y-6">
+                
+                <!-- Tabel Pesanan -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-white">
+                        <h2 class="font-black text-slate-800 flex items-center gap-2 uppercase tracking-tighter">
+                            <i data-lucide="shopping-bag" class="w-5 h-5 text-indigo-500"></i>
+                            Rincian Pesanan
+                        </h2>
+                        <div id="promoBadge" class="hidden flex items-center gap-2 px-3 py-1.5 bg-rose-50 text-rose-600 rounded-lg border border-rose-100 animate-pulse">
+                            <i data-lucide="gift" class="w-3.5 h-3.5"></i>
+                            <span id="promoText" class="text-[10px] font-black uppercase tracking-wider"></span>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-black tracking-widest border-b border-slate-200">
+                                <tr>
+                                    <th class="px-6 py-4">Nama Item</th>
+                                    <th class="px-6 py-4">Jenis</th>
+                                    <th class="px-6 py-4">Warna & Mix</th>
+                                    <th class="px-6 py-4 text-right">Harga</th>
+                                </tr>
+                            </thead>
+                            <tbody id="itemTableBody" class="divide-y divide-slate-100">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Form Konsumen & Akunting -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-5">
+                            <h2 class="font-black text-lg text-slate-800 mb-2 flex items-center gap-2 uppercase tracking-tighter">
+                                <i data-lucide="user" class="w-5 h-5 text-indigo-500"></i>
+                                Data Pelanggan
+                            </h2>
+                            <div class="grid grid-cols-1 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Nama Pemesan</label>
+                                    <input type="text" id="custNama" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-slate-700" placeholder="Nama Pelanggan">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Metode</label>
+                                        <select id="custMetode" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-slate-600">
+                                            <option value="diambil">Diambil</option>
+                                            <option value="cod">COD</option>
+                                            <option value="kurir">Kurir Toko</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Tujuan</label>
+                                        <input type="text" id="custTujuan" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700" placeholder="Lokasi">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Tabel Kebutuhan Stok -->
+                            <div class="mt-8">
+                                <h3 class="font-black text-sm text-slate-800 mb-4 flex items-center gap-2 uppercase tracking-widest border-b pb-2 border-slate-100">
+                                    <i data-lucide="box" class="w-4 h-4 text-emerald-500"></i>
+                                    Kebutuhan Stok Bunga
+                                </h3>
+                                <div class="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
+                                    <table class="w-full text-[11px]">
+                                        <thead class="bg-slate-100 text-slate-500 font-black uppercase tracking-tighter">
+                                            <tr>
+                                                <th class="px-4 py-2 text-left">Bunga - Warna</th>
+                                                <th class="px-4 py-2 text-right">Qty</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="stockTableBody" class="divide-y divide-slate-200 font-medium text-slate-700">
+                                            <tr>
+                                                <td colspan="2" class="px-4 py-4 text-center text-slate-400 italic font-normal">Belum ada data stok</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel Akunting -->
+                        <div class="bg-slate-900 text-white p-6 rounded-3xl shadow-2xl space-y-6 relative overflow-hidden flex flex-col">
+                            <div class="space-y-4 relative z-10">
+                                <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+                                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Subtotal</span>
+                                    <span id="displaySubtotal" class="font-mono font-bold">Rp 0</span>
+                                </div>
+                                <div id="diskonRow" class="hidden flex justify-between items-center text-rose-400">
+                                    <span class="text-[10px] font-black uppercase tracking-widest">Diskon</span>
+                                    <span id="displayDiskon" class="font-mono font-bold">- Rp 0</span>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Input DP / Bayar</label>
+                                    <div class="relative">
+                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 font-bold">Rp</span>
+                                        <input type="number" id="inputDP" class="w-full p-4 pl-12 bg-slate-800 border border-slate-700 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-mono text-xl font-black text-indigo-400 shadow-inner" value="0">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto pt-6 border-t border-slate-800 relative z-10">
+                                <div class="flex justify-between items-end mb-1">
+                                    <span class="text-[11px] font-black text-indigo-400 uppercase tracking-widest">Total Akhir</span>
+                                    <span id="displayTotal" class="text-3xl font-black tracking-tighter italic text-white">Rp 0</span>
+                                </div>
+                                <div class="flex justify-between items-center mt-4 p-4 bg-slate-800/50 rounded-2xl border border-slate-800">
+                                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Sisa Tagihan</span>
+                                    <span id="displaySisa" class="text-xl font-mono font-black text-rose-500">Rp 0</span>
+                                </div>
+                                <div id="lunasBadge" class="hidden mt-3 flex items-center justify-center gap-2 text-[10px] font-black text-emerald-400 uppercase tracking-[0.3em] bg-emerald-400/10 py-2 rounded-lg border border-emerald-400/20">
+                                    <i data-lucide="check-circle-2" class="w-3 h-3"></i> Lunas
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const rawInput = document.getElementById('rawInput');
+        const custNama = document.getElementById('custNama');
+        const custMetode = document.getElementById('custMetode');
+        const custTujuan = document.getElementById('custTujuan');
+        const itemTableBody = document.getElementById('itemTableBody');
+        const stockTableBody = document.getElementById('stockTableBody');
+        const promoBadge = document.getElementById('promoBadge');
+        const promoText = document.getElementById('promoText');
+        const displaySubtotal = document.getElementById('displaySubtotal');
+        const displayDiskon = document.getElementById('displayDiskon');
+        const diskonRow = document.getElementById('diskonRow');
+        const displayTotal = document.getElementById('displayTotal');
+        const displaySisa = document.getElementById('displaySisa');
+        const inputDP = document.getElementById('inputDP');
+        const lunasBadge = document.getElementById('lunasBadge');
+        const displayID = document.getElementById('displayID');
+        const inputFile = document.getElementById('inputFile');
+
+        let state = {
+            id: '',
+            items: [],
+            stock: {},
+            subtotal: 0,
+            diskon: 0,
+            promo: '',
+            total: 0,
+            dp: 0,
+            raw_text: ''
+        };
+
+        function parseCurrency(str) {
+            if (!str) return 0;
+            let clean = str.toLowerCase().replace(/rp/g, '').replace(/[-\(\)\*]/g, '').replace(/\./g, '').trim();
+            let val = clean.includes('rb') ? parseFloat(clean.replace('rb', '')) * 1000 : parseFloat(clean) || 0;
+            return str.includes('-') ? -val : val;
+        }
+
+        function extractTangkai(text) {
+            if (!text) return 0;
+            const match = text.match(/\((\d+)\s*Tangkai\)/i);
+            if (match) return parseInt(match[1]);
+            if (text.toLowerCase().includes('satuan') || text.length > 0) return 1;
+            return 0;
+        }
+
+        function generateID() {
+            const now = new Date();
+            const timestamp = `${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}`;
+            const pembeli = (custNama.value || 'PEMBELI').replace(/\s+/g, '').toUpperCase();
+            const total = state.total.toString();
+            state.id = `${timestamp}_${pembeli}_${total}`;
+            displayID.innerText = state.id;
+        }
+
+        function handleParse() {
+            state.raw_text = rawInput.value;
+            const lines = state.raw_text.split('\n');
+            const newItems = [];
+            let stockMap = {};
+            let currentSubtotal = 0;
+            let currentDiskon = 0;
+            let currentPromo = '';
+
+            const itemRegex = /(\d+)x\s+([^(]+)\s*\(([^)]+)\)/i;
+            const jenisRegex = /Jenis:\s*(.+)/i;
+            const subRegex = /Sub:\s*(.+)/i;
+            const diskonRegex = /Diskon(?:\s*\(\d+%\))?:\s*(.+)/i;
+
+            let tempItem = null;
+
+            lines.forEach((line) => {
+                const trimmedLine = line.trim();
+                const itemMatch = trimmedLine.match(itemRegex);
+
+                if (trimmedLine.toLowerCase().includes("promo: +1 gratis mawar bonus")) {
+                    const bonusKey = "Mawar - Bonus";
+                    stockMap[bonusKey] = (stockMap[bonusKey] || 0) + 1;
+                }
+
+                if (itemMatch) {
+                    if (tempItem) newItems.push(tempItem);
+                    const qtyPesanan = parseInt(itemMatch[1]);
+                    const namaBunga = itemMatch[2].trim();
+                    const colorContent = itemMatch[3].trim();
+                    let mainColor = colorContent;
+                    let mixDetail = '';
+                    if (colorContent.toLowerCase().includes('mix:')) {
+                        const splitMix = colorContent.split(/mix:/i);
+                        mainColor = splitMix[0].replace(/[,;]/g, '').trim() || 'Mix';
+                        mixDetail = splitMix[1].trim();
+                    }
+                    tempItem = { qty: qtyPesanan, nama: namaBunga, warna: mainColor, mixDetail: mixDetail, jenis: '', harga: 0 };
+                } else if (trimmedLine.toLowerCase().includes('jenis:')) {
+                    const m = trimmedLine.match(jenisRegex);
+                    if (tempItem && m) {
+                        tempItem.jenis = m[1].trim();
+                        if (tempItem.mixDetail) {
+                            const mixParts = tempItem.mixDetail.split(',');
+                            mixParts.forEach(part => {
+                                const detailMatch = part.trim().match(/([a-zA-Z\s]+)\s+(\d+)/);
+                                if (detailMatch) {
+                                    const warna = detailMatch[1].trim();
+                                    const totalQty = parseInt(detailMatch[2]);
+                                    const key = `${tempItem.nama} - ${warna}`;
+                                    stockMap[key] = (stockMap[key] || 0) + totalQty;
+                                }
+                            });
+                        } else {
+                            const tangkaiPerItem = extractTangkai(tempItem.jenis);
+                            const totalTangkaiItem = tempItem.qty * tangkaiPerItem;
+                            if (totalTangkaiItem > 0) {
+                                const key = `${tempItem.nama} - ${tempItem.warna}`;
+                                stockMap[key] = (stockMap[key] || 0) + totalTangkaiItem;
+                            }
+                        }
+                    }
+                } else if (trimmedLine.toLowerCase().includes('sub:')) {
+                    const m = trimmedLine.match(subRegex);
+                    if (tempItem && m) tempItem.harga = parseCurrency(m[1]);
+                } else if (trimmedLine.toLowerCase().includes('diskon')) {
+                    const m = trimmedLine.match(diskonRegex);
+                    if (m) currentDiskon = Math.abs(parseCurrency(m[1]));
+                } else if (trimmedLine.toLowerCase().startsWith('promo:') && !trimmedLine.toLowerCase().includes('gratis mawar bonus')) {
+                    currentPromo = trimmedLine.split(':')[1]?.trim();
+                } else if (trimmedLine.toLowerCase().startsWith('subtotal:')) {
+                    currentSubtotal = parseCurrency(trimmedLine.split(':')[1]);
+                }
+            });
+
+            if (tempItem) newItems.push(tempItem);
+            state.items = newItems;
+            state.stock = stockMap;
+            state.subtotal = currentSubtotal || newItems.reduce((acc, curr) => acc + curr.harga, 0);
+            state.diskon = currentDiskon;
+            state.promo = currentPromo;
+            state.total = state.subtotal - state.diskon;
+            
+            generateID();
+            updateUI();
+        }
+
+        function updateUI() {
+            itemTableBody.innerHTML = state.items.length > 0 ? state.items.map((item) => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4 font-black text-slate-700">${item.qty}x ${item.nama}</td>
+                    <td class="px-6 py-4 text-slate-500 text-[11px] font-bold italic">${item.jenis || '-'}</td>
+                    <td class="px-6 py-4">
+                        <span class="inline-block px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded text-[9px] font-black uppercase border border-indigo-100">${item.warna}</span>
+                        <div class="text-[10px] text-slate-400 italic mt-1">${item.mixDetail ? 'Mix: ' + item.mixDetail : ''}</div>
+                    </td>
+                    <td class="px-6 py-4 text-right font-mono font-bold text-slate-700">Rp ${item.harga.toLocaleString('id-ID')}</td>
+                </tr>
+            `).join('') : `<tr><td colspan="4" class="px-6 py-10 text-center text-slate-300 uppercase font-black text-xs">Kosong</td></tr>`;
+
+            const stockKeys = Object.keys(state.stock);
+            stockTableBody.innerHTML = stockKeys.length > 0 ? stockKeys.map(key => `
+                <tr class="${key.includes('Bonus') ? 'bg-indigo-50/50' : ''}">
+                    <td class="px-4 py-3 flex items-center gap-2">
+                        ${key}
+                        ${key.includes('Bonus') ? '<span class="px-1.5 py-0.5 bg-indigo-600 text-[8px] text-white rounded font-black uppercase">Free</span>' : ''}
+                    </td>
+                    <td class="px-4 py-3 text-right font-black text-indigo-600 tracking-tighter">${state.stock[key]} Tangkai</td>
+                </tr>
+            `).join('') : `<tr><td colspan="2" class="px-4 py-4 text-center text-slate-400 italic">Data stok belum tersedia</td></tr>`;
+
+            if (state.promo) {
+                promoBadge.classList.remove('hidden');
+                promoText.innerText = state.promo;
+            } else {
+                promoBadge.classList.add('hidden');
+            }
+
+            displaySubtotal.innerText = `Rp ${state.subtotal.toLocaleString('id-ID')}`;
+            if (state.diskon > 0) {
+                diskonRow.classList.remove('hidden');
+                displayDiskon.innerText = `- Rp ${state.diskon.toLocaleString('id-ID')}`;
+            } else {
+                diskonRow.classList.add('hidden');
+            }
+
+            displayTotal.innerText = `Rp ${state.total.toLocaleString('id-ID')}`;
+            const sisa = state.total - state.dp;
+            displaySisa.innerText = `Rp ${sisa.toLocaleString('id-ID')}`;
+            displaySisa.className = `text-xl font-mono font-black ${sisa > 0 ? "text-rose-500" : "text-emerald-400"}`;
+            lunasBadge.classList.toggle('hidden', !(sisa <= 0 && state.total > 0));
+        }
+
+        function createFullReport() {
+            return {
+                id_pesanan: state.id,
+                timestamp: new Date().toLocaleString('id-ID'),
+                raw_data_pesanan: state.raw_text, // Menyimpan teks asli
+                pelanggan: {
+                    nama: custNama.value || 'Tanpa Nama',
+                    metode: custMetode.value,
+                    tujuan: custTujuan.value || '-'
+                },
+                pesanan: {
+                    items: state.items,
+                    promo: state.promo || 'None',
+                    subtotal: state.subtotal,
+                    diskon: state.diskon,
+                    total_akhir: state.total,
+                    dp_dibayar: state.dp,
+                    sisa_tagihan: state.total - state.dp,
+                    status_lunas: (state.total - state.dp) <= 0
+                },
+                kebutuhan_stok: state.stock
+            };
+        }
+
+        // Event Listeners
+        rawInput.addEventListener('input', handleParse);
+        custNama.addEventListener('input', generateID);
+        inputDP.addEventListener('input', (e) => {
+            state.dp = parseInt(e.target.value) || 0;
+            generateID(); 
+            updateUI();
+        });
+
+        // Simpan Log Konsol
+        document.getElementById('btnSave').addEventListener('click', () => {
+            const fullReport = createFullReport();
+            console.log("%c--- TRANSAKSI DISIMPAN ---", "color: #4f46e5; font-weight: bold; font-size: 14px;");
+            console.log(fullReport);
+            
+            showToast(`ID: ${state.id} Terarsip di Konsol!`);
+        });
+
+        // Download JSON
+        document.getElementById('btnDownload').addEventListener('click', () => {
+            const fullReport = createFullReport();
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fullReport, null, 4));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", `${state.id}.json`);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        });
+
+        // Fitur LOAD JSON
+        document.getElementById('btnLoad').addEventListener('click', () => inputFile.click());
+
+        inputFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    
+                    // Isi kembali form dari JSON
+                    if (data.raw_data_pesanan) {
+                        rawInput.value = data.raw_data_pesanan;
+                    }
+                    if (data.pelanggan) {
+                        custNama.value = data.pelanggan.nama || '';
+                        custMetode.value = data.pelanggan.metode || 'diambil';
+                        custTujuan.value = data.pelanggan.tujuan || '';
+                    }
+                    if (data.pesanan) {
+                        inputDP.value = data.pesanan.dp_dibayar || 0;
+                        state.dp = data.pesanan.dp_dibayar || 0;
+                    }
+
+                    // Trigger re-parsing
+                    handleParse();
+                    showToast("Data Berhasil di-Load!");
+                } catch (err) {
+                    console.error("Gagal membaca JSON:", err);
+                    showToast("Error: Format file tidak valid", true);
+                }
+                inputFile.value = ""; // reset input file
+            };
+            reader.readAsText(file);
+        });
+
+        function showToast(msg, isError = false) {
+            const notify = document.createElement('div');
+            notify.className = `fixed bottom-8 right-8 ${isError ? 'bg-rose-600' : 'bg-indigo-600'} text-white px-6 py-3 rounded-2xl shadow-2xl z-50 animate-bounce font-bold flex items-center gap-3 border border-white/20`;
+            notify.innerHTML = `<i data-lucide="${isError ? 'alert-triangle' : 'check-circle'}" class="w-5 h-5"></i> ${msg}`;
+            document.body.appendChild(notify);
+            lucide.createIcons();
+            setTimeout(() => notify.remove(), 4000);
+        }
+
+        generateID();
+    </script>
+</body>
+</html>
